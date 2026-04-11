@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmony Music Player</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-headphones-alt"></i>
+                <span>Harmony</span>
+            </div>
+            
+            <nav class="nav">
+                <button class="nav-btn active" id="navLibrary">
+                    <i class="fas fa-music"></i>
+                    <span>Library</span>
+                </button>
+                <button class="nav-btn" id="navArtists">
+                    <i class="fas fa-user"></i>
+                    <span>Artists</span>
+                </button>
+                <button class="nav-btn" id="navAlbums">
+                    <i class="fas fa-compact-disc"></i>
+                    <span>Albums</span>
+                </button>
+                <button class="nav-btn" id="navPlaylists">
+                    <i class="fas fa-list"></i>
+                    <span>Playlists</span>
+                </button>
+                <button class="nav-btn" id="navFavorites">
+                    <i class="fas fa-heart"></i>
+                    <span>Favorites</span>
+                </button>
+            </nav>
+            
+            <div class="playlist-section">
+                <div class="section-title">
+                    <h4>PLAYLISTS</h4>
+                    <button id="createPlaylistBtn" class="add-btn">+</button>
+                </div>
+                <div class="playlist-list" id="playlistsList"></div>
+            </div>
+            
+            <div class="upload-area">
+                <button id="selectFolderBtn" class="upload-btn">
+                    <i class="fas fa-folder-open"></i> Choose Folder
+                </button>
+                <button id="selectFilesBtn" class="upload-btn secondary">
+                    <i class="fas fa-music"></i> Select Files
+                </button>
+                <div class="folder-path" id="selectedFolder">
+                    <i class="fas fa-folder"></i>
+                    <span>No folder selected</span>
+                </div>
+                <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;">
+                <input type="file" id="filesInput" multiple accept="audio/*" style="display: none;">
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search songs, artists, albums...">
+                <button id="clearSearchBtn" class="clear-search">×</button>
+            </div>
+            
+            <div class="content-header">
+                <h2 id="viewTitle">All Songs</h2>
+                <span class="count" id="songCount">0 songs</span>
+            </div>
+            
+            <div class="content" id="content">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Now Playing Bar -->
+        <div class="player-bar">
+            <div class="now-playing">
+                <div class="track-icon">
+                    <i class="fas fa-headphones"></i>
+                </div>
+                <div class="track-info">
+                    <div class="track-name" id="nowPlayingTitle">No song playing</div>
+                    <div class="track-artist" id="nowPlayingArtist">Select a song</div>
+                </div>
+                <button id="favoriteCurrentBtn" class="favorite-btn">
+                    <i class="far fa-heart"></i>
+                </button>
+            </div>
+            
+            <div class="controls">
+                <div class="progress">
+                    <span class="time" id="currentTime">0:00</span>
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="time" id="totalTime">0:00</span>
+                </div>
+                
+                <div class="bottom-row">
+                    <div class="control-buttons">
+                        <button id="shuffleBtn" class="ctrl-btn" title="Shuffle">
+                            <i class="fas fa-random"></i>
+                        </button>
+                        <button id="prevBtn" class="ctrl-btn" title="Previous">
+                            <i class="fas fa-step-backward"></i>
+                        </button>
+                        <button id="playPauseBtn" class="ctrl-btn play" title="Play/Pause">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button id="nextBtn" class="ctrl-btn" title="Next">
+                            <i class="fas fa-step-forward"></i>
+                        </button>
+                        <button id="repeatBtn" class="ctrl-btn" title="Repeat">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="volume">
+                        <i class="fas fa-volume-up" id="volumeIcon"></i>
+                        <div class="volume-bar" id="volumeBar">
+                            <div class="volume-fill" id="volumeFill" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <audio id="audioPlayer"></audio>
+            <div class="waveform" id="waveformContainer"></div>
+        </div>
+    </div>
+    
+    <!-- Create Playlist Modal -->
+    <div class="modal" id="createPlaylistModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Playlist</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="playlistNameInput" placeholder="Playlist name">
+                <textarea id="playlistDescInput" placeholder="Description (optional)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" id="cancelPlaylistBtn">Cancel</button>
+                <button class="save-btn" id="savePlaylistBtn">Create</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add to Playlist Modal -->
+    <div class="modal" id="addToPlaylistModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add to Playlist</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="playlistOptions"></div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/player.js') }}"></script>
+</body>
+</html>
