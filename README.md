@@ -19,4 +19,8 @@ Users can view and manage songs inside playlists.
 
 <img width="1867" height="944" alt="playlist" src="https://github.com/user-attachments/assets/aeb9b43d-46a5-4c65-8f6f-8ee9c6378ac7" />
 
+## Add Song Feature
+Users can add new songs to the playlist by entering song details and uploading audio files.
+
+<img width="1867" height="944" alt="add song" src="https://github.com/user-attachments/assets/85f10835-6303-4b73-aa35-7db60dec4872" />
 
