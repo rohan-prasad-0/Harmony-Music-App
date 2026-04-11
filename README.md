@@ -1,5 +1,5 @@
 # Harmony Music App
-[![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/rohan-prasad-0/Harmony-Music-App.git)
+
 
 `Harmony` is a web-based music player built with Flask and Python. It features a responsive user interface for managing and playing local audio files, with core playlist functionality powered by a custom Doubly Linked List abstract data type (ADT).
 
