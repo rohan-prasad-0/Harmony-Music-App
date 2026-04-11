@@ -24,3 +24,7 @@ Users can add new songs to the playlist by entering song details and uploading a
 
 <img width="1867" height="944" alt="add song" src="https://github.com/user-attachments/assets/85f10835-6303-4b73-aa35-7db60dec4872" />
 
+## Test Results
+Automated unit tests were executed successfully using Pytest.
+
+<img width="1566" height="579" alt="test result" src="https://github.com/user-attachments/assets/c27a0d15-190a-480b-90b3-25305b3b13fb" />
