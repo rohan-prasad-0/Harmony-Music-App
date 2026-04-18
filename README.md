@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Harmony Music App
 
 
