@@ -1477,25 +1477,41 @@ class MusicPlayer {
             const response = await fetch('/api/upload_files', { method: 'POST', body: formData });
             const data = await response.json();
             if (data.success) {
-                // APPEND new files to existing playlist instead of replacing
-                this.playlist = [...this.playlist, ...data.files];
-                this.originalPlaylist = [...this.playlist];
-                this.currentSortType = null;
-                this.isShuffle = false;
-                if (this.shuffleBtn) this.shuffleBtn.classList.remove('active');
-                this.shuffledPlaylist = [];
-                if (this.songCount) this.songCount.textContent = `${this.playlist.length} songs`;
-                await this.loadFavorites();
-                await this.loadPlaylists();
-                this.switchView('library');
-                if (this.playlist.length > 0 && this.playlist.length === data.total_library_size) {
-                    // Only auto-play if this is the first upload
-                    this.currentIndex = 0;
-                    this.loadSong(0);
-                    this.showNotification(`Loaded ${this.playlist.length} songs!`);
+                if (data.files && data.files.length > 0) {
+                    // APPEND only new files (backend already filters duplicates)
+                    this.playlist = [...this.playlist, ...data.files];
+                    this.originalPlaylist = [...this.playlist];
+                    this.currentSortType = null;
+                    this.isShuffle = false;
+                    if (this.shuffleBtn) this.shuffleBtn.classList.remove('active');
+                    this.shuffledPlaylist = [];
+                    if (this.songCount) this.songCount.textContent = `${this.playlist.length} songs`;
+                    await this.loadFavorites();
+                    await this.loadPlaylists();
+                    
+                    if (data.total_library_size === data.files.length) {
+                        // First upload - auto-play first song
+                        this.switchView('library');
+                        this.currentIndex = 0;
+                        this.loadSong(0);
+                        this.showNotification(`Loaded ${data.files.length} songs!`);
+                    } else {
+                        // Subsequent upload - just refresh view
+                        this.switchView('library');
+                        if (data.skipped_duplicates && data.skipped_duplicates > 0) {
+                            this.showNotification(`Added ${data.files.length} new songs! (Skipped ${data.skipped_duplicates} duplicates) Total: ${this.playlist.length} songs`);
+                        } else {
+                            this.showNotification(`Added ${data.files.length} new songs! Total: ${this.playlist.length} songs`);
+                        }
+                        this.renderLibrary();
+                    }
                 } else {
-                    this.showNotification(`Added ${data.files.length} new songs! Total: ${this.playlist.length} songs`);
-                    this.renderLibrary();
+                    // No new files (all duplicates)
+                    if (data.skipped_duplicates && data.skipped_duplicates > 0) {
+                        this.showNotification(`All ${data.skipped_duplicates} file(s) already exist in library`, 'error');
+                    } else {
+                        this.showNotification('No new files to add', 'error');
+                    }
                 }
             }
         } catch (error) {
@@ -1521,25 +1537,41 @@ class MusicPlayer {
             const response = await fetch('/api/upload_files', { method: 'POST', body: formData });
             const data = await response.json();
             if (data.success) {
-                // APPEND new files to existing playlist instead of replacing
-                this.playlist = [...this.playlist, ...data.files];
-                this.originalPlaylist = [...this.playlist];
-                this.currentSortType = null;
-                this.isShuffle = false;
-                if (this.shuffleBtn) this.shuffleBtn.classList.remove('active');
-                this.shuffledPlaylist = [];
-                if (this.songCount) this.songCount.textContent = `${this.playlist.length} songs`;
-                await this.loadFavorites();
-                await this.loadPlaylists();
-                this.switchView('library');
-                if (this.playlist.length > 0 && this.playlist.length === data.total_library_size) {
-                    // Only auto-play if this is the first upload
-                    this.currentIndex = 0;
-                    this.loadSong(0);
-                    this.showNotification(`Loaded ${this.playlist.length} songs!`);
+                if (data.files && data.files.length > 0) {
+                    // APPEND only new files (backend already filters duplicates)
+                    this.playlist = [...this.playlist, ...data.files];
+                    this.originalPlaylist = [...this.playlist];
+                    this.currentSortType = null;
+                    this.isShuffle = false;
+                    if (this.shuffleBtn) this.shuffleBtn.classList.remove('active');
+                    this.shuffledPlaylist = [];
+                    if (this.songCount) this.songCount.textContent = `${this.playlist.length} songs`;
+                    await this.loadFavorites();
+                    await this.loadPlaylists();
+                    
+                    if (data.total_library_size === data.files.length) {
+                        // First upload - auto-play first song
+                        this.switchView('library');
+                        this.currentIndex = 0;
+                        this.loadSong(0);
+                        this.showNotification(`Loaded ${data.files.length} songs!`);
+                    } else {
+                        // Subsequent upload - just refresh view
+                        this.switchView('library');
+                        if (data.skipped_duplicates && data.skipped_duplicates > 0) {
+                            this.showNotification(`Added ${data.files.length} new songs! (Skipped ${data.skipped_duplicates} duplicates) Total: ${this.playlist.length} songs`);
+                        } else {
+                            this.showNotification(`Added ${data.files.length} new songs! Total: ${this.playlist.length} songs`);
+                        }
+                        this.renderLibrary();
+                    }
                 } else {
-                    this.showNotification(`Added ${data.files.length} new songs! Total: ${this.playlist.length} songs`);
-                    this.renderLibrary();
+                    // No new files (all duplicates)
+                    if (data.skipped_duplicates && data.skipped_duplicates > 0) {
+                        this.showNotification(`All ${data.skipped_duplicates} file(s) already exist in library`, 'error');
+                    } else {
+                        this.showNotification('No new files to add', 'error');
+                    }
                 }
             }
         } catch (error) {

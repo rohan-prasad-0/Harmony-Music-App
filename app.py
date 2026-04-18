@@ -300,6 +300,9 @@ class MusicPlayer:
             self.cleanup_thread = threading.Thread(target=self.cleanup_old_files, daemon=True)
             self.cleanup_thread.start()
         
+        # Create a set of existing paths for quick lookup
+        existing_paths = {song['path'] for song in self.library}
+        
         for file in files:
             try:
                 filename = file.filename
@@ -331,28 +334,45 @@ class MusicPlayer:
                     'duration': metadata.get('duration', 0),
                     'id': str(int(time.time() * 1000)) + str(counter)
                 }
-                music_files.append(song_data)
                 
+                # Check if song already exists in library by comparing file paths
+                # Also check if the same file content already exists
+                file_already_exists = False
+                for existing_song in self.library:
+                    # Compare by filename or by actual file path
+                    if (existing_song.get('filename') == song_data['filename'] or 
+                        existing_song.get('path') == song_data['path'] or
+                        os.path.basename(existing_song.get('path', '')) == song_data['filename']):
+                        file_already_exists = True
+                        break
+                
+                if not file_already_exists:
+                    music_files.append(song_data)
+                else:
+                    print(f"Skipping duplicate file: {filename}")
+                    
             except Exception as e:
                 print(f"Error processing file {file.filename}: {e}")
                 continue
         
-        # APPEND new files to existing library instead of replacing
-        self.library.extend(music_files)
-        self.current_folder = folder_name
-        
-        # Add to default playlist (My Playlist) - append without duplicates
-        for playlist_id, playlist in self.playlists.items():
-            if playlist.name == "My Playlist":
-                for song in music_files:
-                    playlist.add_song(song)
-                break
+        # Only extend if we have new files
+        if music_files:
+            self.library.extend(music_files)
+            self.current_folder = folder_name
+            
+            # Add to default playlist (My Playlist) - only new songs
+            for playlist_id, playlist in self.playlists.items():
+                if playlist.name == "My Playlist":
+                    for song in music_files:
+                        playlist.add_song(song)
+                    break
         
         return {
             'success': True,
             'files': music_files,
             'count': len(music_files),
-            'total_library_size': len(self.library)
+            'total_library_size': len(self.library),
+            'skipped_duplicates': len(files) - len(music_files)
         }
     
     def get_metadata(self, file_path):
