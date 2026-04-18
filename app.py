@@ -337,13 +337,13 @@ class MusicPlayer:
                 print(f"Error processing file {file.filename}: {e}")
                 continue
         
-        self.library = music_files
+        # APPEND new files to existing library instead of replacing
+        self.library.extend(music_files)
         self.current_folder = folder_name
         
-        # Add to default playlist (My Playlist) - no duplicates
+        # Add to default playlist (My Playlist) - append without duplicates
         for playlist_id, playlist in self.playlists.items():
             if playlist.name == "My Playlist":
-                playlist.clear()
                 for song in music_files:
                     playlist.add_song(song)
                 break
@@ -351,7 +351,8 @@ class MusicPlayer:
         return {
             'success': True,
             'files': music_files,
-            'count': len(music_files)
+            'count': len(music_files),
+            'total_library_size': len(self.library)
         }
     
     def get_metadata(self, file_path):

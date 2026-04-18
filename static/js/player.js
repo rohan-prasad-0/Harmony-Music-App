@@ -1477,7 +1477,8 @@ class MusicPlayer {
             const response = await fetch('/api/upload_files', { method: 'POST', body: formData });
             const data = await response.json();
             if (data.success) {
-                this.playlist = data.files;
+                // APPEND new files to existing playlist instead of replacing
+                this.playlist = [...this.playlist, ...data.files];
                 this.originalPlaylist = [...this.playlist];
                 this.currentSortType = null;
                 this.isShuffle = false;
@@ -1487,10 +1488,14 @@ class MusicPlayer {
                 await this.loadFavorites();
                 await this.loadPlaylists();
                 this.switchView('library');
-                if (this.playlist.length > 0) {
+                if (this.playlist.length > 0 && this.playlist.length === data.total_library_size) {
+                    // Only auto-play if this is the first upload
                     this.currentIndex = 0;
                     this.loadSong(0);
                     this.showNotification(`Loaded ${this.playlist.length} songs!`);
+                } else {
+                    this.showNotification(`Added ${data.files.length} new songs! Total: ${this.playlist.length} songs`);
+                    this.renderLibrary();
                 }
             }
         } catch (error) {
@@ -1516,7 +1521,8 @@ class MusicPlayer {
             const response = await fetch('/api/upload_files', { method: 'POST', body: formData });
             const data = await response.json();
             if (data.success) {
-                this.playlist = data.files;
+                // APPEND new files to existing playlist instead of replacing
+                this.playlist = [...this.playlist, ...data.files];
                 this.originalPlaylist = [...this.playlist];
                 this.currentSortType = null;
                 this.isShuffle = false;
@@ -1526,10 +1532,14 @@ class MusicPlayer {
                 await this.loadFavorites();
                 await this.loadPlaylists();
                 this.switchView('library');
-                if (this.playlist.length > 0) {
+                if (this.playlist.length > 0 && this.playlist.length === data.total_library_size) {
+                    // Only auto-play if this is the first upload
                     this.currentIndex = 0;
                     this.loadSong(0);
                     this.showNotification(`Loaded ${this.playlist.length} songs!`);
+                } else {
+                    this.showNotification(`Added ${data.files.length} new songs! Total: ${this.playlist.length} songs`);
+                    this.renderLibrary();
                 }
             }
         } catch (error) {
